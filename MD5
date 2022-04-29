@@ -1,4 +1,4 @@
-130ca11fce2c75d5ca1cbdbbbf3a1ac7 *DESCRIPTION
+e8201d01069df58ee1e218d886356188 *DESCRIPTION
 987c2b16f9650ef2884f67006ea67c91 *NAMESPACE
 85299f8ee492c5af34c38dd196c3a032 *R/BRISC_correlation.R
 c2b37a3fc7cd9c8066a202ba639332c8 *R/BRISC_decorrelation.R
@@ -25,10 +25,10 @@ e0425207c876974f9bb51b357c9ed958 *man/BRISC_decorrelation.Rd
 b86d8d2d34817e7eb44f8024d925f0d3 *man/BRISC_prediction.Rd
 29daa7258af8f2554e0c6bce56ccb778 *man/BRISC_simulation.Rd
 613960f2fa4eb0e5702869aee0807367 *man/BRISC_variogram.ci.Rd
-8b72f1dfdc9b2ae8bc72d8e075ea5877 *src/BRISC.cpp
-5b13fbdc7014e15936aba7762eaf7f5b *src/BRISC_Predict.cpp
-949ef4c5fea442c91b330d1a65ff8a4a *src/Makevars.in
-c9913ee333570d7f4fe65dec78bc5641 *src/Makevars.win
+03b29fc1143b681a1f8cb1eb92acbda6 *src/BRISC.cpp
+419a44622e20c03d22baa7f678751295 *src/BRISC_Predict.cpp
+9570329f09dda9d9a0ba5a8df4db3fef *src/Makevars.in
+86f8604eefdf72c1e10f96eb3d406f27 *src/Makevars.win
 a0bf4f5a332ab020e581ee3556bb5c2a *src/arithmetic_ansi.h
 18148b11b438b02db024504a3f07042d *src/arithmetic_sse_double.h
 db8da74d413c57e32de9b8a30d9d0d2c *src/arithmetic_sse_float.h
