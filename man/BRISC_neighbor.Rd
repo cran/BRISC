@@ -84,7 +84,7 @@ n <- 1000
 coords <- cbind(runif(n,0,1), runif(n,0,1))
 
 
-ordering_result <- BRISC_order(coords)
+neighbor_result <- BRISC_neighbor(coords)
 }
 
 \keyword{model}

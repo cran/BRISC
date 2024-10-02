@@ -1,3 +1,7 @@
+#ifndef R_NO_REMAP
+#  define R_NO_REMAP
+#endif
+
 #define USE_FC_LEN_T
 #include <string>
 #include <stdio.h>
@@ -96,8 +100,8 @@ extern "C" {
                         }
                     }
                 }
-                F77_NAME(dpotrf)(&lower, &nnIndxLU[n+i], &C[CIndx[i]], &nnIndxLU[n+i], &info FCONE); if(info != 0){error("c++ error: dpotrf failed\n");}
-                F77_NAME(dpotri)(&lower, &nnIndxLU[n+i], &C[CIndx[i]], &nnIndxLU[n+i], &info FCONE); if(info != 0){error("c++ error: dpotri failed\n");}
+                F77_NAME(dpotrf)(&lower, &nnIndxLU[n+i], &C[CIndx[i]], &nnIndxLU[n+i], &info FCONE); if(info != 0){Rf_error("c++ error: dpotrf failed\n");}
+                F77_NAME(dpotri)(&lower, &nnIndxLU[n+i], &C[CIndx[i]], &nnIndxLU[n+i], &info FCONE); if(info != 0){Rf_error("c++ error: dpotri failed\n");}
                 F77_NAME(dsymv)(&lower, &nnIndxLU[n+i], &one, &C[CIndx[i]], &nnIndxLU[n+i], &c[nnIndxLU[i]], &inc, &zero, &B[nnIndxLU[i]], &inc FCONE);
                 F[i] = 1 - F77_NAME(ddot)(&nnIndxLU[n+i], &B[nnIndxLU[i]], &inc, &c[nnIndxLU[i]], &inc) + theta[0]*fix_nugget;
             }else{
@@ -174,8 +178,8 @@ extern "C" {
             }
         }
 
-        F77_NAME(dpotrf)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){error("c++ error: dpotrf failed\n");}
-        F77_NAME(dpotri)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){error("c++ error: dpotri failed\n");}
+        F77_NAME(dpotrf)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){Rf_error("c++ error: dpotrf failed\n");}
+        F77_NAME(dpotri)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){Rf_error("c++ error: dpotri failed\n");}
 
         //create Beta
         F77_NAME(dsymv)(lower, &p, &one, tmp_pp, &p, tmp_p, &inc, &zero, beta, &inc FCONE);
@@ -255,8 +259,8 @@ extern "C" {
             }
         }
 
-        F77_NAME(dpotrf)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){error("c++ error: dpotrf failed\n");}
-        F77_NAME(dpotri)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){error("c++ error: dpotri failed\n");}
+        F77_NAME(dpotrf)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){Rf_error("c++ error: dpotrf failed\n");}
+        F77_NAME(dpotri)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){Rf_error("c++ error: dpotri failed\n");}
         F77_NAME(dsymv)(lower, &p, &one, tmp_pp, &p, tmp_p, &inc, &zero, beta, &inc FCONE);
         F77_NAME(dgemv)(ntran, &n, &p, &one, X, &n, beta, &inc, &zero, tmp_n, &inc FCONE);
         F77_NAME(daxpy)(&n, &negOne, y, &inc, tmp_n, &inc);
@@ -359,8 +363,8 @@ extern "C" {
             }
         }
 
-        F77_NAME(dpotrf)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){error("c++ error: dpotrf failed\n");}
-        F77_NAME(dpotri)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){error("c++ error: dpotri failed\n");}
+        F77_NAME(dpotrf)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){Rf_error("c++ error: dpotrf failed\n");}
+        F77_NAME(dpotri)(lower, &p, tmp_pp, &p, &info FCONE); if(info != 0){Rf_error("c++ error: dpotri failed\n");}
 
         //create Beta
         F77_NAME(dsymv)(lower, &p, &one, tmp_pp, &p, tmp_p, &inc, &zero, beta_boot, &inc FCONE);
@@ -406,7 +410,7 @@ extern "C" {
 
         int nProtect = 0;
 
-        SEXP residual_boot_r; PROTECT(residual_boot_r = allocVector(REALSXP, n_nngp)); nProtect++; double *residual_boot = REAL(residual_boot_r);
+        SEXP residual_boot_r; PROTECT(residual_boot_r = Rf_allocVector(REALSXP, n_nngp)); nProtect++; double *residual_boot = REAL(residual_boot_r);
 
         solve_B_F(REAL(B_r), REAL(F_r), REAL(norm_residual_boot_r), n_nngp, INTEGER(nnIndxLU_r), INTEGER(nnIndx_r), residual_boot);
 
@@ -416,14 +420,14 @@ extern "C" {
         SEXP result_r, resultName_r;
         int nResultListObjs = 1;
 
-        PROTECT(result_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
-        PROTECT(resultName_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(result_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(resultName_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
 
         SET_VECTOR_ELT(result_r, 0, residual_boot_r);
-        SET_VECTOR_ELT(resultName_r, 0, mkChar("result"));
+        SET_VECTOR_ELT(resultName_r, 0, Rf_mkChar("result"));
 
 
-        namesgets(result_r, resultName_r);
+        Rf_namesgets(result_r, resultName_r);
         //unprotect
         UNPROTECT(nProtect);
 
@@ -455,7 +459,7 @@ extern "C" {
 
         int nProtect = 0;
 
-        SEXP residual_boot_r; PROTECT(residual_boot_r = allocVector(REALSXP, n_nngp)); nProtect++; double *residual_boot = REAL(residual_boot_r);
+        SEXP residual_boot_r; PROTECT(residual_boot_r = Rf_allocVector(REALSXP, n_nngp)); nProtect++; double *residual_boot = REAL(residual_boot_r);
 
         solve_B_F(REAL(B_r), REAL(F_r), REAL(norm_residual_boot_r), n_nngp, INTEGER(nnIndxLU_r), INTEGER(nnIndx_r), residual_boot);
 
@@ -506,25 +510,25 @@ extern "C" {
 
         int nTheta_full = nTheta + 1;
 
-        SEXP theta_fp_r; PROTECT(theta_fp_r = allocVector(REALSXP, nTheta_full)); nProtect++; double *theta_fp_boot = REAL(theta_fp_r);
+        SEXP theta_fp_r; PROTECT(theta_fp_r = Rf_allocVector(REALSXP, nTheta_full)); nProtect++; double *theta_fp_boot = REAL(theta_fp_r);
 
-        SEXP beta_r; PROTECT(beta_r = allocVector(REALSXP, p_nngp)); nProtect++; double *beta_boot = REAL(beta_r);
+        SEXP beta_r; PROTECT(beta_r = Rf_allocVector(REALSXP, p_nngp)); nProtect++; double *beta_boot = REAL(beta_r);
 
         processed_bootstrap_output(X_nngp, y_nngp, D_nngp, d_nngp, nnIndx_nngp, nnIndxLU_nngp, CIndx_nngp, n_nngp, p_nngp, m_nngp, theta_boot, covModel_nngp, j_nngp, nThreads_nngp, fx, beta_boot, theta_fp_boot, fix_nugget_nngp);
 
         SEXP result_r, resultName_r;
         int nResultListObjs = 2;
 
-        PROTECT(result_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
-        PROTECT(resultName_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(result_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(resultName_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
 
         SET_VECTOR_ELT(result_r, 0, theta_fp_r);
-        SET_VECTOR_ELT(resultName_r, 0, mkChar("theta"));
+        SET_VECTOR_ELT(resultName_r, 0, Rf_mkChar("theta"));
 
         SET_VECTOR_ELT(result_r, 1, beta_r);
-        SET_VECTOR_ELT(resultName_r, 1, mkChar("Beta"));
+        SET_VECTOR_ELT(resultName_r, 1, Rf_mkChar("Beta"));
 
-        namesgets(result_r, resultName_r);
+        Rf_namesgets(result_r, resultName_r);
         //unprotect
         UNPROTECT(nProtect);
 
@@ -561,7 +565,7 @@ extern "C" {
         omp_set_num_threads(nThreads_nngp);
 #else
         if(nThreads_nngp > 1){
-            warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads_nngp);
+            Rf_warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads_nngp);
             nThreads_nngp = 1;
         }
 #endif
@@ -601,10 +605,10 @@ extern "C" {
 
         //allocated for the nearest neighbor index vector (note, first location has no neighbors).
         int nIndx = static_cast<int>(static_cast<double>(1+m_nngp)/2*m_nngp+(n_nngp-m_nngp-1)*m_nngp);
-        SEXP nnIndx_r; PROTECT(nnIndx_r = allocVector(INTSXP, nIndx)); nProtect++; nnIndx_nngp = INTEGER(nnIndx_r);
-        SEXP d_r; PROTECT(d_r = allocVector(REALSXP, nIndx)); nProtect++; d_nngp = REAL(d_r);
+        SEXP nnIndx_r; PROTECT(nnIndx_r = Rf_allocVector(INTSXP, nIndx)); nProtect++; nnIndx_nngp = INTEGER(nnIndx_r);
+        SEXP d_r; PROTECT(d_r = Rf_allocVector(REALSXP, nIndx)); nProtect++; d_nngp = REAL(d_r);
 
-        SEXP nnIndxLU_r; PROTECT(nnIndxLU_r = allocVector(INTSXP, 2*n_nngp)); nProtect++; nnIndxLU_nngp = INTEGER(nnIndxLU_r); //first column holds the nnIndx index for the i-th location and the second columns holds the number of neighbors the i-th location has (the second column is a bit of a waste but will simplifying some parallelization).
+        SEXP nnIndxLU_r; PROTECT(nnIndxLU_r = Rf_allocVector(INTSXP, 2*n_nngp)); nProtect++; nnIndxLU_nngp = INTEGER(nnIndxLU_r); //first column holds the nnIndx index for the i-th location and the second columns holds the number of neighbors the i-th location has (the second column is a bit of a waste but will simplifying some parallelization).
 
         //make the neighbor index
         if(verbose){
@@ -625,7 +629,7 @@ extern "C" {
         }
 
 
-        SEXP CIndx_r; PROTECT(CIndx_r = allocVector(INTSXP, 2*n_nngp)); nProtect++; CIndx_nngp = INTEGER(CIndx_r); //index for D and C.
+        SEXP CIndx_r; PROTECT(CIndx_r = Rf_allocVector(INTSXP, 2*n_nngp)); nProtect++; CIndx_nngp = INTEGER(CIndx_r); //index for D and C.
         for(i = 0, j_nngp = 0; i < n_nngp; i++){//zero should never be accessed
             j_nngp += nnIndxLU_nngp[n_nngp+i]*nnIndxLU_nngp[n_nngp+i];
             if(i == 0){
@@ -637,11 +641,11 @@ extern "C" {
             }
         }
 
-        SEXP j_r; PROTECT(j_r = allocVector(INTSXP, 1)); nProtect++; INTEGER(j_r)[0] = j_nngp;
+        SEXP j_r; PROTECT(j_r = Rf_allocVector(INTSXP, 1)); nProtect++; INTEGER(j_r)[0] = j_nngp;
 
-        SEXP D_r; PROTECT(D_r = allocVector(REALSXP, j_nngp)); nProtect++; D_nngp = REAL(D_r);
+        SEXP D_r; PROTECT(D_r = Rf_allocVector(REALSXP, j_nngp)); nProtect++; D_nngp = REAL(D_r);
 
-        SEXP llk_r; PROTECT(llk_r = allocVector(REALSXP, 1)); nProtect++; double* llk_nngp = REAL(llk_r);
+        SEXP llk_r; PROTECT(llk_r = Rf_allocVector(REALSXP, 1)); nProtect++; double* llk_nngp = REAL(llk_r);
 
         for(i = 0; i < n_nngp; i++){
             for(k = 0; k < nnIndxLU_nngp[n_nngp+i]; k++){
@@ -702,18 +706,18 @@ extern "C" {
 
         int nTheta_full = nTheta + 1;
 
-        SEXP B_r; PROTECT(B_r = allocVector(REALSXP, nIndx)); nProtect++; double *B_nngp = REAL(B_r);
+        SEXP B_r; PROTECT(B_r = Rf_allocVector(REALSXP, nIndx)); nProtect++; double *B_nngp = REAL(B_r);
 
-        SEXP F_r; PROTECT(F_r = allocVector(REALSXP, n_nngp)); nProtect++; double *F_nngp = REAL(F_r);
+        SEXP F_r; PROTECT(F_r = Rf_allocVector(REALSXP, n_nngp)); nProtect++; double *F_nngp = REAL(F_r);
 
-        SEXP beta_r; PROTECT(beta_r = allocVector(REALSXP, p_nngp)); nProtect++; double *beta_nngp = REAL(beta_r);
+        SEXP beta_r; PROTECT(beta_r = Rf_allocVector(REALSXP, p_nngp)); nProtect++; double *beta_nngp = REAL(beta_r);
 
 
-        SEXP Xbeta_r; PROTECT(Xbeta_r = allocVector(REALSXP, n_nngp)); nProtect++; double *Xbeta_nngp = REAL(Xbeta_r);
+        SEXP Xbeta_r; PROTECT(Xbeta_r = Rf_allocVector(REALSXP, n_nngp)); nProtect++; double *Xbeta_nngp = REAL(Xbeta_r);
 
-        SEXP norm_residual_r; PROTECT(norm_residual_r = allocVector(REALSXP, n_nngp)); nProtect++; double *norm_residual_nngp = REAL(norm_residual_r);
+        SEXP norm_residual_r; PROTECT(norm_residual_r = Rf_allocVector(REALSXP, n_nngp)); nProtect++; double *norm_residual_nngp = REAL(norm_residual_r);
 
-        SEXP theta_fp_r; PROTECT(theta_fp_r = allocVector(REALSXP, nTheta_full)); nProtect++; double *theta_fp_nngp = REAL(theta_fp_r);
+        SEXP theta_fp_r; PROTECT(theta_fp_r = Rf_allocVector(REALSXP, nTheta_full)); nProtect++; double *theta_fp_nngp = REAL(theta_fp_r);
 
         llk_nngp[0] = processed_output(X_nngp, y_nngp, D_nngp, d_nngp, nnIndx_nngp, nnIndxLU_nngp, CIndx_nngp, n_nngp, p_nngp, m_nngp, theta_nngp, covModel_nngp, j_nngp, nThreads_nngp, fx, B_nngp, F_nngp, beta_nngp, Xbeta_nngp, norm_residual_nngp, theta_fp_nngp, fix_nugget_nngp);
 
@@ -725,53 +729,53 @@ extern "C" {
 
 
 
-        PROTECT(result_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
-        PROTECT(resultName_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(result_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(resultName_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
 
         SET_VECTOR_ELT(result_r, 0, B_r);
-        SET_VECTOR_ELT(resultName_r, 0, mkChar("B"));
+        SET_VECTOR_ELT(resultName_r, 0, Rf_mkChar("B"));
 
         SET_VECTOR_ELT(result_r, 1, F_r);
-        SET_VECTOR_ELT(resultName_r, 1, mkChar("F"));
+        SET_VECTOR_ELT(resultName_r, 1, Rf_mkChar("F"));
 
         SET_VECTOR_ELT(result_r, 2, beta_r);
-        SET_VECTOR_ELT(resultName_r, 2, mkChar("Beta"));
+        SET_VECTOR_ELT(resultName_r, 2, Rf_mkChar("Beta"));
 
         SET_VECTOR_ELT(result_r, 3, norm_residual_r);
-        SET_VECTOR_ELT(resultName_r, 3, mkChar("norm.residual"));
+        SET_VECTOR_ELT(resultName_r, 3, Rf_mkChar("norm.residual"));
 
         SET_VECTOR_ELT(result_r, 4, theta_fp_r);
-        SET_VECTOR_ELT(resultName_r, 4, mkChar("theta"));
+        SET_VECTOR_ELT(resultName_r, 4, Rf_mkChar("theta"));
 
 
         SET_VECTOR_ELT(result_r, 5, Xbeta_r);
-        SET_VECTOR_ELT(resultName_r, 5, mkChar("Xbeta"));
+        SET_VECTOR_ELT(resultName_r, 5, Rf_mkChar("Xbeta"));
 
         SET_VECTOR_ELT(result_r, 6, llk_r);
-        SET_VECTOR_ELT(resultName_r, 6, mkChar("log_likelihood"));
+        SET_VECTOR_ELT(resultName_r, 6, Rf_mkChar("log_likelihood"));
 
 
         SET_VECTOR_ELT(result_r, 7, nnIndxLU_r);
-        SET_VECTOR_ELT(resultName_r, 7, mkChar("nnIndxLU"));
+        SET_VECTOR_ELT(resultName_r, 7, Rf_mkChar("nnIndxLU"));
 
         SET_VECTOR_ELT(result_r, 8, CIndx_r);
-        SET_VECTOR_ELT(resultName_r, 8, mkChar("CIndx"));
+        SET_VECTOR_ELT(resultName_r, 8, Rf_mkChar("CIndx"));
 
         SET_VECTOR_ELT(result_r, 9, D_r);
-        SET_VECTOR_ELT(resultName_r, 9, mkChar("D"));
+        SET_VECTOR_ELT(resultName_r, 9, Rf_mkChar("D"));
 
         SET_VECTOR_ELT(result_r, 10, d_r);
-        SET_VECTOR_ELT(resultName_r, 10, mkChar("d"));
+        SET_VECTOR_ELT(resultName_r, 10, Rf_mkChar("d"));
 
         SET_VECTOR_ELT(result_r, 11, nnIndx_r);
-        SET_VECTOR_ELT(resultName_r, 11, mkChar("nnIndx"));
+        SET_VECTOR_ELT(resultName_r, 11, Rf_mkChar("nnIndx"));
 
         SET_VECTOR_ELT(result_r, 12, j_r);
-        SET_VECTOR_ELT(resultName_r, 12, mkChar("Length.D"));
+        SET_VECTOR_ELT(resultName_r, 12, Rf_mkChar("Length.D"));
 
 
 
-        namesgets(result_r, resultName_r);
+        Rf_namesgets(result_r, resultName_r);
 
         //unprotect
         UNPROTECT(nProtect);
@@ -806,7 +810,7 @@ extern "C" {
         omp_set_num_threads(nThreads);
 #else
         if(nThreads > 1){
-            warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads);
+            Rf_warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads);
             nThreads = 1;
         }
 #endif
@@ -886,7 +890,7 @@ extern "C" {
 
         double *D = (double *) R_alloc(j, sizeof(double));
 
-        SEXP sim_cor_r; PROTECT(sim_cor_r = allocVector(REALSXP, tot_length)); nProtect++; double *sim_cor = REAL(sim_cor_r);
+        SEXP sim_cor_r; PROTECT(sim_cor_r = Rf_allocVector(REALSXP, tot_length)); nProtect++; double *sim_cor = REAL(sim_cor_r);
 
         for(i = 0; i < n; i++){
             for(k = 0; k < nnIndxLU[n+i]; k++){
@@ -923,16 +927,16 @@ extern "C" {
 
 
 
-        PROTECT(result_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
-        PROTECT(resultName_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(result_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(resultName_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
 
         SET_VECTOR_ELT(result_r, 0, sim_r);
-        SET_VECTOR_ELT(resultName_r, 0, mkChar("norm_sim"));
+        SET_VECTOR_ELT(resultName_r, 0, Rf_mkChar("norm_sim"));
 
         SET_VECTOR_ELT(result_r, 1, sim_cor_r);
-        SET_VECTOR_ELT(resultName_r, 1, mkChar("sim"));
+        SET_VECTOR_ELT(resultName_r, 1, Rf_mkChar("sim"));
 
-        namesgets(result_r, resultName_r);
+        Rf_namesgets(result_r, resultName_r);
 
         //unprotect
         UNPROTECT(nProtect);
@@ -971,7 +975,7 @@ extern "C" {
         omp_set_num_threads(nThreads);
 #else
         if(nThreads > 1){
-            warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads);
+            Rf_warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads);
             nThreads = 1;
         }
 #endif
@@ -1049,7 +1053,7 @@ extern "C" {
 
         double *D = (double *) R_alloc(j, sizeof(double));
 
-        SEXP sim_decor_r; PROTECT(sim_decor_r = allocVector(REALSXP, tot_length)); nProtect++; double *sim_decor = REAL(sim_decor_r);
+        SEXP sim_decor_r; PROTECT(sim_decor_r = Rf_allocVector(REALSXP, tot_length)); nProtect++; double *sim_decor = REAL(sim_decor_r);
 
         for(i = 0; i < n; i++){
             for(k = 0; k < nnIndxLU[n+i]; k++){
@@ -1085,16 +1089,16 @@ extern "C" {
 
 
 
-        PROTECT(result_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
-        PROTECT(resultName_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(result_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(resultName_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
 
         SET_VECTOR_ELT(result_r, 0, sim_r);
-        SET_VECTOR_ELT(resultName_r, 0, mkChar("sim"));
+        SET_VECTOR_ELT(resultName_r, 0, Rf_mkChar("sim"));
 
         SET_VECTOR_ELT(result_r, 1, sim_decor_r);
-        SET_VECTOR_ELT(resultName_r, 1, mkChar("residual_sim"));
+        SET_VECTOR_ELT(resultName_r, 1, Rf_mkChar("residual_sim"));
 
-        namesgets(result_r, resultName_r);
+        Rf_namesgets(result_r, resultName_r);
 
         //unprotect
         UNPROTECT(nProtect);
@@ -1125,7 +1129,7 @@ extern "C" {
         omp_set_num_threads(nThreads_nngp);
 #else
         if(nThreads_nngp > 1){
-            warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads_nngp);
+            Rf_warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads_nngp);
             nThreads_nngp = 1;
         }
 #endif
@@ -1145,10 +1149,10 @@ extern "C" {
 
         //allocated for the nearest neighbor index vector (note, first location has no neighbors).
         int nIndx = static_cast<int>(static_cast<double>(1+m_nngp)/2*m_nngp+(n_nngp-m_nngp-1)*m_nngp);
-        SEXP nnIndx_r; PROTECT(nnIndx_r = allocVector(INTSXP, nIndx)); nProtect++; nnIndx_nngp = INTEGER(nnIndx_r);
-        SEXP d_r; PROTECT(d_r = allocVector(REALSXP, nIndx)); nProtect++; d_nngp = REAL(d_r);
+        SEXP nnIndx_r; PROTECT(nnIndx_r = Rf_allocVector(INTSXP, nIndx)); nProtect++; nnIndx_nngp = INTEGER(nnIndx_r);
+        SEXP d_r; PROTECT(d_r = Rf_allocVector(REALSXP, nIndx)); nProtect++; d_nngp = REAL(d_r);
 
-        SEXP nnIndxLU_r; PROTECT(nnIndxLU_r = allocVector(INTSXP, 2*n_nngp)); nProtect++; nnIndxLU_nngp = INTEGER(nnIndxLU_r); //first column holds the nnIndx index for the i-th location and the second columns holds the number of neighbors the i-th location has (the second column is a bit of a waste but will simplifying some parallelization).
+        SEXP nnIndxLU_r; PROTECT(nnIndxLU_r = Rf_allocVector(INTSXP, 2*n_nngp)); nProtect++; nnIndxLU_nngp = INTEGER(nnIndxLU_r); //first column holds the nnIndx index for the i-th location and the second columns holds the number of neighbors the i-th location has (the second column is a bit of a waste but will simplifying some parallelization).
 
         //make the neighbor index
         if(verbose){
@@ -1169,7 +1173,7 @@ extern "C" {
         }
 
 
-        SEXP CIndx_r; PROTECT(CIndx_r = allocVector(INTSXP, 2*n_nngp)); nProtect++; CIndx_nngp = INTEGER(CIndx_r); //index for D and C.
+        SEXP CIndx_r; PROTECT(CIndx_r = Rf_allocVector(INTSXP, 2*n_nngp)); nProtect++; CIndx_nngp = INTEGER(CIndx_r); //index for D and C.
         for(i = 0, j_nngp = 0; i < n_nngp; i++){//zero should never be accessed
             j_nngp += nnIndxLU_nngp[n_nngp+i]*nnIndxLU_nngp[n_nngp+i];
             if(i == 0){
@@ -1181,9 +1185,9 @@ extern "C" {
             }
         }
 
-        SEXP j_r; PROTECT(j_r = allocVector(INTSXP, 1)); nProtect++; INTEGER(j_r)[0] = j_nngp;
+        SEXP j_r; PROTECT(j_r = Rf_allocVector(INTSXP, 1)); nProtect++; INTEGER(j_r)[0] = j_nngp;
 
-        SEXP D_r; PROTECT(D_r = allocVector(REALSXP, j_nngp)); nProtect++; D_nngp = REAL(D_r);
+        SEXP D_r; PROTECT(D_r = Rf_allocVector(REALSXP, j_nngp)); nProtect++; D_nngp = REAL(D_r);
 
         for(i = 0; i < n_nngp; i++){
             for(k = 0; k < nnIndxLU_nngp[n_nngp+i]; k++){
@@ -1199,30 +1203,30 @@ extern "C" {
 
 
 
-        PROTECT(result_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
-        PROTECT(resultName_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(result_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(resultName_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
 
 
         SET_VECTOR_ELT(result_r, 0, nnIndxLU_r);
-        SET_VECTOR_ELT(resultName_r, 0, mkChar("nnIndxLU"));
+        SET_VECTOR_ELT(resultName_r, 0, Rf_mkChar("nnIndxLU"));
 
         SET_VECTOR_ELT(result_r, 1, CIndx_r);
-        SET_VECTOR_ELT(resultName_r, 1, mkChar("CIndx"));
+        SET_VECTOR_ELT(resultName_r, 1, Rf_mkChar("CIndx"));
 
         SET_VECTOR_ELT(result_r, 2, D_r);
-        SET_VECTOR_ELT(resultName_r, 2, mkChar("D"));
+        SET_VECTOR_ELT(resultName_r, 2, Rf_mkChar("D"));
 
         SET_VECTOR_ELT(result_r, 3, d_r);
-        SET_VECTOR_ELT(resultName_r, 3, mkChar("d"));
+        SET_VECTOR_ELT(resultName_r, 3, Rf_mkChar("d"));
 
         SET_VECTOR_ELT(result_r, 4, nnIndx_r);
-        SET_VECTOR_ELT(resultName_r, 4, mkChar("nnIndx"));
+        SET_VECTOR_ELT(resultName_r, 4, Rf_mkChar("nnIndx"));
 
         SET_VECTOR_ELT(result_r, 5, j_r);
-        SET_VECTOR_ELT(resultName_r, 5, mkChar("Length.D"));
+        SET_VECTOR_ELT(resultName_r, 5, Rf_mkChar("Length.D"));
 
 
-        namesgets(result_r, resultName_r);
+        Rf_namesgets(result_r, resultName_r);
 
         //unprotect
         UNPROTECT(nProtect);
@@ -1259,7 +1263,7 @@ extern "C" {
         omp_set_num_threads(nThreads_nngp);
 #else
         if(nThreads_nngp > 1){
-            warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads_nngp);
+            Rf_warning("n.omp.threads > %i, but source not compiled with OpenMP support.", nThreads_nngp);
             nThreads_nngp = 1;
         }
 #endif
@@ -1310,7 +1314,7 @@ extern "C" {
 
         D_nngp = REAL(D_r);
 
-        SEXP llk_r; PROTECT(llk_r = allocVector(REALSXP, 1)); nProtect++; double* llk_nngp = REAL(llk_r);
+        SEXP llk_r; PROTECT(llk_r = Rf_allocVector(REALSXP, 1)); nProtect++; double* llk_nngp = REAL(llk_r);
 
         if(verbose){
             Rprintf("----------------------------------------\n");
@@ -1363,18 +1367,18 @@ extern "C" {
 
         int nTheta_full = nTheta + 1;
 
-        SEXP B_r; PROTECT(B_r = allocVector(REALSXP, nIndx)); nProtect++; double *B_nngp = REAL(B_r);
+        SEXP B_r; PROTECT(B_r = Rf_allocVector(REALSXP, nIndx)); nProtect++; double *B_nngp = REAL(B_r);
 
-        SEXP F_r; PROTECT(F_r = allocVector(REALSXP, n_nngp)); nProtect++; double *F_nngp = REAL(F_r);
+        SEXP F_r; PROTECT(F_r = Rf_allocVector(REALSXP, n_nngp)); nProtect++; double *F_nngp = REAL(F_r);
 
-        SEXP beta_r; PROTECT(beta_r = allocVector(REALSXP, p_nngp)); nProtect++; double *beta_nngp = REAL(beta_r);
+        SEXP beta_r; PROTECT(beta_r = Rf_allocVector(REALSXP, p_nngp)); nProtect++; double *beta_nngp = REAL(beta_r);
 
 
-        SEXP Xbeta_r; PROTECT(Xbeta_r = allocVector(REALSXP, n_nngp)); nProtect++; double *Xbeta_nngp = REAL(Xbeta_r);
+        SEXP Xbeta_r; PROTECT(Xbeta_r = Rf_allocVector(REALSXP, n_nngp)); nProtect++; double *Xbeta_nngp = REAL(Xbeta_r);
 
-        SEXP norm_residual_r; PROTECT(norm_residual_r = allocVector(REALSXP, n_nngp)); nProtect++; double *norm_residual_nngp = REAL(norm_residual_r);
+        SEXP norm_residual_r; PROTECT(norm_residual_r = Rf_allocVector(REALSXP, n_nngp)); nProtect++; double *norm_residual_nngp = REAL(norm_residual_r);
 
-        SEXP theta_fp_r; PROTECT(theta_fp_r = allocVector(REALSXP, nTheta_full)); nProtect++; double *theta_fp_nngp = REAL(theta_fp_r);
+        SEXP theta_fp_r; PROTECT(theta_fp_r = Rf_allocVector(REALSXP, nTheta_full)); nProtect++; double *theta_fp_nngp = REAL(theta_fp_r);
 
         llk_nngp[0] = processed_output(X_nngp, y_nngp, D_nngp, d_nngp, nnIndx_nngp, nnIndxLU_nngp, CIndx_nngp, n_nngp, p_nngp, m_nngp, theta_nngp, covModel_nngp, j_nngp, nThreads_nngp, fx, B_nngp, F_nngp, beta_nngp, Xbeta_nngp, norm_residual_nngp, theta_fp_nngp, fix_nugget_nngp);
 
@@ -1386,34 +1390,34 @@ extern "C" {
 
 
 
-        PROTECT(result_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
-        PROTECT(resultName_r = allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(result_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
+        PROTECT(resultName_r = Rf_allocVector(VECSXP, nResultListObjs)); nProtect++;
 
         SET_VECTOR_ELT(result_r, 0, B_r);
-        SET_VECTOR_ELT(resultName_r, 0, mkChar("B"));
+        SET_VECTOR_ELT(resultName_r, 0, Rf_mkChar("B"));
 
         SET_VECTOR_ELT(result_r, 1, F_r);
-        SET_VECTOR_ELT(resultName_r, 1, mkChar("F"));
+        SET_VECTOR_ELT(resultName_r, 1, Rf_mkChar("F"));
 
         SET_VECTOR_ELT(result_r, 2, beta_r);
-        SET_VECTOR_ELT(resultName_r, 2, mkChar("Beta"));
+        SET_VECTOR_ELT(resultName_r, 2, Rf_mkChar("Beta"));
 
         SET_VECTOR_ELT(result_r, 3, norm_residual_r);
-        SET_VECTOR_ELT(resultName_r, 3, mkChar("norm.residual"));
+        SET_VECTOR_ELT(resultName_r, 3, Rf_mkChar("norm.residual"));
 
         SET_VECTOR_ELT(result_r, 4, theta_fp_r);
-        SET_VECTOR_ELT(resultName_r, 4, mkChar("theta"));
+        SET_VECTOR_ELT(resultName_r, 4, Rf_mkChar("theta"));
 
 
         SET_VECTOR_ELT(result_r, 5, Xbeta_r);
-        SET_VECTOR_ELT(resultName_r, 5, mkChar("Xbeta"));
+        SET_VECTOR_ELT(resultName_r, 5, Rf_mkChar("Xbeta"));
 
 
         SET_VECTOR_ELT(result_r, 6, llk_r);
-        SET_VECTOR_ELT(resultName_r, 6, mkChar("log_likelihood"));
+        SET_VECTOR_ELT(resultName_r, 6, Rf_mkChar("log_likelihood"));
 
 
-        namesgets(result_r, resultName_r);
+        Rf_namesgets(result_r, resultName_r);
 
         //unprotect
         UNPROTECT(nProtect);

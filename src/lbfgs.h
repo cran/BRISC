@@ -25,6 +25,9 @@
  */
 
 /* $Id$ */
+#ifndef R_NO_REMAP
+#  define R_NO_REMAP
+#endif
 
 #ifndef __LBFGS_H__
 #define __LBFGS_H__

@@ -1,3 +1,7 @@
+#ifndef R_NO_REMAP
+#  define R_NO_REMAP
+#endif
+
 #include <string>
 
 void zeros(double *a, int n);

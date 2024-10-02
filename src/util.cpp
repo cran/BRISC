@@ -1,3 +1,7 @@
+#ifndef R_NO_REMAP
+#  define R_NO_REMAP
+#endif
+
 #include <string>
 #include <limits>
 #include "util.h"
@@ -81,7 +85,7 @@ std::string getCorName(int i){
   }else if(i == 3){
     return "gaussian";
   }else{
-    error("c++ error: cov.model is not correctly specified");
+    Rf_error("c++ error: cov.model is not correctly specified");
   }
 
 }
@@ -121,7 +125,7 @@ double spCor(double &D, double &phi, double &nu, int &covModel, double *bk){
     return exp(-1.0*(pow(phi*D,2)));
 
   }else{
-    error("c++ error: cov.model is not correctly specified");
+    Rf_error("c++ error: cov.model is not correctly specified");
   }
 }
 

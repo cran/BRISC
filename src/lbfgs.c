@@ -60,6 +60,9 @@ I would like to thank the original author, Jorge Nocedal, who has been
 distributing the effieicnt and explanatory implementation in an open source
 licence.
 */
+#ifndef R_NO_REMAP
+#  define R_NO_REMAP
+#endif
 
 #ifdef  HAVE_CONFIG_H
 #include <config.h>
